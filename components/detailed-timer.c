@@ -2,6 +2,10 @@
 
 typedef struct _UrnDetailedTimer {
     UrnComponent base;
+    GtkWidget *detailed_timer;
+    GtkWidget *detailed_info;
+    GtkWidget *segment_pb;
+    GtkWidget *segment_best;
     GtkWidget *detailed_time;
     GtkWidget *time;
     GtkWidget *time_seconds;
@@ -20,8 +24,26 @@ UrnComponent *urn_component_detailed_timer_new() {
     if (!self) return NULL;
     self->base.ops = &urn_detailed_timer_operations;
 
+    self->detailed_timer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_widget_show(self->detailed_timer);
+
+    self->detailed_info = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_box_pack_start(GTK_BOX(self->detailed_timer), self->detailed_info, FALSE, FALSE, 0);
+    gtk_widget_show(self->detailed_info);
+
+    self->segment_best = gtk_label_new(NULL);
+    add_class(self->segment_best, "segment-best");
+    gtk_box_pack_end(GTK_BOX(self->detailed_info), self->segment_best, FALSE, FALSE, 0);
+    gtk_widget_show(self->segment_best);
+
+    self->segment_pb = gtk_label_new(NULL);
+    add_class(self->segment_pb, "segment-pb");
+    gtk_box_pack_end(GTK_BOX(self->detailed_info), self->segment_pb, FALSE, FALSE, 0);
+    gtk_widget_show(self->segment_pb);
+
     self->detailed_time = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     add_class(self->detailed_time, "timer");
+    gtk_box_pack_end(GTK_BOX(self->detailed_timer), self->detailed_time, TRUE, TRUE, 0);
     gtk_widget_show(self->detailed_time);
 
     self->time = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -89,7 +111,7 @@ static void urn_detailed_timer_delete(UrnComponent *self) {
 }
 
 static GtkWidget *detailed_timer_widget(UrnComponent *self) {
-    return ((UrnDetailedTimer *)self)->detailed_time;
+    return ((UrnDetailedTimer *)self)->detailed_timer;
 }
 
 static void detailed_timer_clear_game(UrnComponent *self_) {
@@ -107,6 +129,8 @@ static void detailed_timer_clear_game(UrnComponent *self_) {
 static void detailed_timer_draw(UrnComponent *self_, urn_game *game, urn_timer *timer) {
     UrnDetailedTimer *self = (UrnDetailedTimer *)self_;
     char str[256], millis[256], seg[256], seg_millis[256];
+    char pb[256] = "PB:    ";
+    char best[256] = "Best: ";
     int curr;
 
     curr = timer->curr_split;
@@ -155,6 +179,12 @@ static void detailed_timer_draw(UrnComponent *self_, urn_game *game, urn_timer *
         gtk_label_set_text(GTK_LABEL(self->segment_seconds), seg);
         gtk_label_set_text(GTK_LABEL(self->segment_millis), seg_millis);
     }
+
+    urn_time_string(&pb[6], game->segment_times[timer->curr_split]);
+    gtk_label_set_text(GTK_LABEL(self->segment_pb), pb);
+
+    urn_time_string(&best[6], game->best_segments[timer->curr_split]);
+    gtk_label_set_text(GTK_LABEL(self->segment_best), best);
 
 }
 
