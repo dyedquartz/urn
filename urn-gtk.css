@@ -20,11 +20,19 @@
 }
 
 .timer-seconds {
-  font-size: 300%;
+  font-size: 275%;
 }
 
 .timer-millis {
-  font-size: 225%;
+  font-size: 200%;
+}
+
+.segment-seconds {
+  font-size: 200%;
+}
+
+.segment-millis {
+  font-size: 150%;
 }
 
 .split-time {
